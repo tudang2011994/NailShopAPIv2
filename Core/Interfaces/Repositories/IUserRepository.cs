@@ -9,7 +9,7 @@ namespace Core.Interfaces.Repositories
 {
     public interface IUserRepository
     {
-        Task<User> getUserbyUsernameAsync(string username);
+        Task<User> getUserbyPhoneNumberAsync(string phoneNumber);
         Task addUserAsync(User user);
         Task updateUserAsync(User user);
         Task deleteUserAsync(Guid id);

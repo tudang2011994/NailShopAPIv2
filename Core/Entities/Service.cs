@@ -13,7 +13,7 @@ namespace Core.Entities
         public string ServiceName {  get; set; }
         public float Amount { get; set; }
         public bool IsValid {  get; set; }
-        public int Duration { get; set; }
+        public float Duration { get; set; }
 
         //Other Join table
         public ICollection<StaffService> StaffServices { get; set; }

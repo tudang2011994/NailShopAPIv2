@@ -39,9 +39,9 @@ namespace Infrastructure.Data.Repositories
             }
         }
 
-        public async Task<User> getUserbyUsernameAsync(string username)
+        public async Task<User> getUserbyPhoneNumberAsync(string phoneNumber)
         {
-            return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+            return await _context.Users.FirstOrDefaultAsync(x => x.PhoneNumber == phoneNumber);
         }
 
         public async Task<IEnumerable<User>> getAllUserAsync()

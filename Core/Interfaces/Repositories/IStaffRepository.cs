@@ -10,7 +10,7 @@ namespace Core.Interfaces.Repositories
     public interface IStaffRepository
     {
         public Task addStaffAsync(Staff staff);
-        public Task<ICollection<Staff>> getAllStaffAsync();
+        public Task<IEnumerable<Staff>> getAllStaffAsync();
 
         public Task<Staff> getStaffByIdAsync(int id);
         public Task updateStaffAsync(Staff staff);

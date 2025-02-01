@@ -14,7 +14,7 @@ namespace Infrastructure.Data.Repositories
 
         private readonly MyAppDbContext _context;
 
-        StaffRepository(MyAppDbContext context)
+        public StaffRepository(MyAppDbContext context)
         {
             _context = context;
         }
@@ -34,9 +34,10 @@ namespace Infrastructure.Data.Repositories
             }          
         }
 
-        public async Task<ICollection<Staff>> getAllStaffAsync()
+        public async Task<IEnumerable<Staff>> getAllStaffAsync()
         {
-            return await _context.Staffs.Include(s => s.StaffServices).ThenInclude(ss => ss.Staff).ToListAsync();
+            //return await _context.Staffs.Include(s => s.StaffServices).ThenInclude(ss => ss.Staff).ToListAsync();
+            return await _context.Staffs.ToListAsync();
         }
 
         public async Task<Staff> getStaffByIdAsync(int id)

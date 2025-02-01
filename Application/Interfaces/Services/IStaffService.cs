@@ -13,5 +13,7 @@ namespace Application.Interfaces.Services
         public Task addStaffAsync(StaffDTO staff);
         public Task deleteStaffAsync(int id);
         public Task updateStaffAsync(StaffUpdateDTO staffDTO);
+
+        public Task<IEnumerable<Staff>> getAllStaffsAsync();
     }
 }

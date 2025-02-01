@@ -19,7 +19,11 @@ namespace Infrastructure.Data
         public DbSet<Service> Services { get; set; }
         public DbSet<Staff> Staffs { get; set; }
         public DbSet<StaffService> StaffServices { get; set; }
-        //public DbSet<CheckInWork> CheckInWorks { get; set; }
+
+        public DbSet<Reward> Rewards { get; set; } // Added to include rewards
+        public DbSet<Coupon> Coupons { get; set; }
+        public DbSet<LoyaltyPoint> LoyaltyPoints { get; set; } // Added to include loyalty points
+
 
         //// In Infrastructure project
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -50,6 +54,108 @@ namespace Infrastructure.Data
             //modelBuilder.Entity<CheckInWork>().HasOne(cw => cw.Booking).WithMany(b => b.CheckInWorks).HasForeignKey(cw => cw.BookingId);
             modelBuilder.Entity<Booking>().HasOne(cw => cw.Service).WithMany(s => s.Bookings).HasForeignKey(cw => cw.ServiceId);
             modelBuilder.Entity<Booking>().HasOne(cw => cw.Staff).WithMany(s => s.Bookings).HasForeignKey(cw => cw.StaffId);
+
+            // One to Many User - LoyaltyPoint
+            modelBuilder.Entity<LoyaltyPoint>().HasOne(lp => lp.User).WithMany(u => u.LoyaltyPointsTransactions).HasForeignKey(lp => lp.UserId);
+
+
+
+            // Seed initial data for Users
+            //modelBuilder.Entity<User>().HasData(
+            //    new User
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        Email = "john.doe@example.com",
+            //        PhoneNumber = "1234567890",
+            //        Name = "John Doe",
+            //        Password = "password",
+            //        isRegisterUser = true,
+            //        LoyaltyPoints = 0
+            //    },
+            //    new User
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        Email = "jane.smith@example.com",
+            //        PhoneNumber = "0987654321",
+            //        Name = "Jane Smith",
+            //        Password = "password",
+            //        isRegisterUser = true,
+            //        LoyaltyPoints = 0
+            //    }
+            //);
+
+            //// Seed initial data for Services
+            //modelBuilder.Entity<Service>().HasData(
+            //    new Service
+            //    {
+            //        Id = 1,
+            //        ServiceName = "Manicure",
+            //        Amount = 20.0f,
+            //        IsValid = true,
+            //        Duration = 30.0f
+            //    },
+            //    new Service
+            //    {
+            //        Id = 2,
+            //        ServiceName = "Pedicure",
+            //        Amount = 25.0f,
+            //        IsValid = true,
+            //        Duration = 45.0f
+            //    }
+            //);
+
+            //// Seed initial data for Staff
+            //modelBuilder.Entity<Staff>().HasData(
+            //    new Staff
+            //    {
+            //        Id = 1,
+            //        Name = "Alice",
+            //        WorkingDay = "MTWHFSU"
+            //    },
+            //    new Staff
+            //    {
+            //        Id = 2,
+            //        Name = "Bob",
+            //        WorkingDay = "MT_HF_U"
+            //    }
+            //);
+
+            //// Seed initial data for StaffService (linking Staff and Service)
+            //modelBuilder.Entity<StaffService>().HasData(
+            //    new StaffService
+            //    {
+            //        StaffId = 1,
+            //        ServiceId = 1
+            //    },
+            //    new StaffService
+            //    {
+            //        StaffId = 1,
+            //        ServiceId = 2
+            //    },
+            //    new StaffService
+            //    {
+            //        StaffId = 2,
+            //        ServiceId = 1
+            //    }
+            //);
+
+            //// Seed initial data for Rewards
+            //modelBuilder.Entity<Reward>().HasData(
+            //    new Reward
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        Name = "Free Service",
+            //        RequiredPoints = 100,
+            //        Description = "Get a free service when you reach 100 points."
+            //    },
+            //    new Reward
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        Name = "Discount Voucher",
+            //        RequiredPoints = 50,
+            //        Description = "Get a $10 discount voucher when you reach 50 points."
+            //    }
+            //);
         }
     }
 }

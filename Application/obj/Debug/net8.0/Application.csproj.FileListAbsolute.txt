@@ -10,6 +10,7 @@ C:\Users\TU NGAN\source\repos\Application\obj\Debug\net8.0\Application.Generated
 C:\Users\TU NGAN\source\repos\Application\obj\Debug\net8.0\Application.AssemblyInfoInputs.cache
 C:\Users\TU NGAN\source\repos\Application\obj\Debug\net8.0\Application.AssemblyInfo.cs
 C:\Users\TU NGAN\source\repos\Application\obj\Debug\net8.0\Application.csproj.CoreCompileInputs.cache
+C:\Users\TU NGAN\source\repos\Application\obj\Debug\net8.0\Application.sourcelink.json
 C:\Users\TU NGAN\source\repos\Application\obj\Debug\net8.0\Applicat.44B5EDA2.Up2Date
 C:\Users\TU NGAN\source\repos\Application\obj\Debug\net8.0\Application.dll
 C:\Users\TU NGAN\source\repos\Application\obj\Debug\net8.0\refint\Application.dll

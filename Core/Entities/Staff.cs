@@ -11,6 +11,7 @@ namespace Core.Entities
     {
         public int Id { get; set; } 
         public string Name { get; set; }
+        public string WorkingDay { get; set; }
 
         //Join other table
         public ICollection<StaffService> StaffServices { get; set; }

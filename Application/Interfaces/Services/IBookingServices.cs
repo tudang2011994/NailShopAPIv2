@@ -13,9 +13,10 @@ namespace Application.Interfaces.Services
         Task<Booking> getBookingByUserIdAsync(Guid id);
         Task<IEnumerable<Booking>> getAllBookingInDateRangeAsync(DateTime startDate, int days);
         Task<ICollection<Booking>> addBookingAsync(List<BookingDTO> booking);
+        Task addAllBookingsAsync(List<BookingDTO> bookingDtos);
 
         Task updateBookingAsync(BookingUpdateDTO booking);
         Task deleteBookingAsync(Guid id);
-
+        Task<Booking> createBookingAsync(CreateBookingRequestDTO createBookingRequest);
     }
 }

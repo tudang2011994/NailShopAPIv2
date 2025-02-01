@@ -1,73 +1,89 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Core.Entities;
 using Core.Interfaces.Repositories;
 using Application.Interfaces.Services;
-using System.Security.Cryptography;
+using Google.Apis.Auth;
 
-namespace Application.Services
+public class UserServices : IUserServices
 {
-    public class UserServices: IUserServices
+    private readonly IUserRepository _userRepository;
+    private readonly IOTPService _otpService;
+
+    public UserServices(IUserRepository userRepository, IOTPService otpService)
     {
-        private readonly IUserRepository _userRepository;
+        _userRepository = userRepository;
+        _otpService = otpService;
+    }
 
-        public UserServices(IUserRepository userRepository)
-        {  
-            _userRepository = userRepository; 
-        }
+    public async Task<User> getUserByPhoneNumberAsync(string phoneNumber)
+    {
+        return await _userRepository.getUserByPhoneNumberAsync(phoneNumber);
+    }
 
-        public async Task<User> getUserByUsernameAsync(string username)
+    public async Task<User> RegisterUserAsync(string phoneNumber, string email, string password)
+    {
+        var user = new User
         {
-            return await _userRepository.getUserbyUsernameAsync(username);
-        }
+            Id = Guid.NewGuid(),
+            PhoneNumber = phoneNumber,
+            Email = email,
+            Password = password,
+            isRegisterUser = true
+        };
+        await _userRepository.addUserAsync(user);
+        await _userRepository.saveChangesAsync();
+        return user;
+    }
 
-
-        //Register new Customer
-        public async Task<User> RegisterUserAsync(string username, string email, string password)
+    public async Task<User> AuthenticateUserAsync(string phoneNumber, string password)
+    {
+        var user = await _userRepository.getUserByPhoneNumberAsync(phoneNumber);
+        if (user == null || user.Password != password)
         {
-            var existintUser = await _userRepository.getUserbyUsernameAsync(username);
+            throw new UnauthorizedAccessException();
+        }
+        return user;
+    }
 
-            if (existintUser != null) throw new InvalidOperationException("Username already exists.");
-
-            var passwordHash = HashPassword(password);
-
-            var user = new User
+    public async Task<User> AuthenticateWithGoogleAsync(string idToken)
+    {
+        var payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
+        var user = await _userRepository.getUserByEmailAsync(payload.Email);
+        if (user == null)
+        {
+            user = new User
             {
-                Username = username,
-                Email = email,
-                Password = passwordHash
+                Id = Guid.NewGuid(),
+                Email = payload.Email,
+                Name = payload.Name,
+                GoogleId = payload.Subject,
+                isRegisterUser = true
             };
-
             await _userRepository.addUserAsync(user);
             await _userRepository.saveChangesAsync();
-
-            return user;
-
-
         }
+        return user;
+    }
 
-        //Login services
-        public async Task<User> AuthenticateUserAsync(string username, string password)
+    public async Task<User> AuthenticateWithOTPAsync(string phoneNumber, string otp)
+    {
+        var isValidOTP = await _otpService.VerifyOTPAsync(phoneNumber, otp);
+        if (!isValidOTP)
         {
-            var existingUser = await _userRepository.getUserbyUsernameAsync(username);
-            if (existingUser == null) throw new UnauthorizedAccessException("Invalid credentials.");
-            if (existingUser.Password != HashPassword(password)) throw new UnauthorizedAccessException("Invalid credentials");
-
-            return existingUser;
+            throw new UnauthorizedAccessException();
         }
-
-
-        //Hash function raw password
-        private string HashPassword(string password)
+        var user = await _userRepository.getUserByPhoneNumberAsync(phoneNumber);
+        if (user == null)
         {
-            using var sha256 = SHA256.Create();
-            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(bytes);
+            throw new UnauthorizedAccessException();
         }
+        return user;
+    }
 
-
+    public async Task SendOTPAsync(string phoneNumber)
+    {
+        var otp = _otpService.GenerateOTP();
+        await _otpService.SendOTPAsync(phoneNumber, otp);
     }
 }

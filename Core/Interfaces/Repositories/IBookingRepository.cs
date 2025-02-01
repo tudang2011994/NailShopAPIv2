@@ -10,7 +10,8 @@ namespace Core.Interfaces.Repositories
     public interface IBookingRepository
     {
         Task<Booking> getBookingByIdAsync(Guid id);
-        Task addBookingAsync(ICollection<Booking> booking);
+        Task addAllBookingAsync(ICollection<Booking> booking);
+        Task addBookingAsync(Booking booking);
         Task updateBookingAsync(Booking booking);
         Task deleteBookingAsync(Guid id);
         Task<IEnumerable<Booking>> getAllBookingAsync();

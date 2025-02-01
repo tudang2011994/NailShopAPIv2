@@ -18,10 +18,14 @@ namespace Infrastructure.Data.Repositories
             _context = context; 
         }
 
-        public async Task addBookingAsync(ICollection<Booking> booking)
+        public async Task addAllBookingAsync(ICollection<Booking> booking)
         {
            _context.Bookings.AddRange(booking);
+        }
 
+        public async Task addBookingAsync(Booking booking)
+        {
+            _context.Bookings.AddAsync(booking);
         }
 
         public async Task deleteBookingAsync(Guid id)

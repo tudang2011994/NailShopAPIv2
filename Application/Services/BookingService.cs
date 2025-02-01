@@ -14,10 +14,66 @@ namespace Application.Services
     public class BookingService : IBookingServices
     {
         private readonly IBookingRepository _bookingRepository;
+        private readonly IUserRepository _userRepository;
 
-        public BookingService(IBookingRepository bookingRepository)
+        public BookingService(IBookingRepository bookingRepository, IUserRepository userRepository)
         {
             _bookingRepository = bookingRepository;
+            _userRepository = userRepository;
+        }
+
+        public async Task addAllBookingsAsync(List<BookingDTO> bookingDtos)
+        {
+            foreach (var bookingDto in bookingDtos)
+            {
+
+                // Map BookingDTO to Booking entity
+                var bookingEntity = new Booking
+                {
+                    BookingTime = bookingDto.BookingTime,
+                    ServiceId = bookingDto.ServiceId,
+                    StaffId = bookingDto.StaffId,
+                    UserId = bookingDto.UserId,
+                };
+
+                // Save each booking to the database
+                await _bookingRepository.addBookingAsync(bookingEntity);
+            }
+
+            // Commit all changes
+            await _bookingRepository.saveChangesAsync();
+        }
+        public async Task<Booking> createBookingAsync(CreateBookingRequestDTO createBookingRequest)
+        {
+            // Check if user exists by phone number
+            var user = await _userRepository.getUserbyPhoneNumberAsync(createBookingRequest.CustomerInfo.Phone);
+            if (user == null)
+            {
+                // Create new user if not exists
+                user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    PhoneNumber = createBookingRequest.CustomerInfo.Phone,
+                    Email = createBookingRequest.CustomerInfo.Email,
+                    Name = createBookingRequest.CustomerInfo.FullName, // Added to match the full name field
+                    isRegisterUser = false
+                };
+                await _userRepository.addUserAsync(user);
+                await _userRepository.saveChangesAsync();
+            }
+
+            var bookingDto = new BookingDTO
+            {
+                UserId = user.Id,
+                BookingTime = DateTime.Parse($"{createBookingRequest.Date.ToShortDateString()} {createBookingRequest.Time}"),
+                StaffId = 0, // Assuming you need to set this based on some logic
+                ServiceId = createBookingRequest.ServiceId,
+                Status = BookingStatus.Pending, // Assuming a default status
+                SpecialRequest = createBookingRequest.SpecialRequest // Added to match the special request field
+            };
+
+            var bookings = await addBookingAsync(new List<BookingDTO> { bookingDto });
+            return bookings.FirstOrDefault();
         }
 
         public async Task<ICollection<Booking>> addBookingAsync(List<BookingDTO> bookingDTOs)
@@ -26,11 +82,13 @@ namespace Application.Services
             foreach(var bookingDTO in bookingDTOs)
             { 
                 Guid tempBookingId = Guid.NewGuid();
+
+                DateTime localTime = bookingDTO.BookingTime.ToLocalTime();
                 //Map DTO To Entity
                 var booking = new Booking
                 {
                     Id = tempBookingId,
-                    BookingTime = bookingDTO.BookingTime,
+                    BookingTime = localTime,
                     UserId = bookingDTO.UserId,
                     ServiceId = bookingDTO.ServiceId,
                     StaffId = bookingDTO.StaffId,
@@ -38,7 +96,7 @@ namespace Application.Services
                 };
                 bookings.Add(booking);
             }
-            await _bookingRepository.addBookingAsync(bookings);
+            await _bookingRepository.addAllBookingAsync(bookings);
             await _bookingRepository.saveChangesAsync();
             return bookings;
         }

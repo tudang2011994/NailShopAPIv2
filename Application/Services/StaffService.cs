@@ -14,11 +14,11 @@ namespace Application.Services
 {
     public class StaffServices : IStaffServices
     {
-        private readonly IStaffRepository _staffService;
+        private readonly IStaffRepository _staffRepository;
 
-        StaffServices(IStaffRepository staffService)
+        public StaffServices(IStaffRepository staffRepository)
         {
-            _staffService = staffService;
+            _staffRepository = staffRepository;
         }
 
         public async Task addStaffAsync(StaffDTO staffDTO)
@@ -27,12 +27,17 @@ namespace Application.Services
             {
                 Name = staffDTO.Name,
             };
-            await _staffService.addStaffAsync(staff);
+            await _staffRepository.addStaffAsync(staff);
         }
 
         public async Task deleteStaffAsync(int id)
         {
-            await _staffService.deleteStaffAsync(id);
+            await _staffRepository.deleteStaffAsync(id);
+        }
+
+        public async Task<IEnumerable<Staff>> getAllStaffsAsync()
+        {
+            return await _staffRepository.getAllStaffAsync();
         }
 
         public async Task updateStaffAsync(StaffUpdateDTO staffDTO)
@@ -46,7 +51,7 @@ namespace Application.Services
                     ServiceId = ss.Id,
                 }).ToList()
             };
-            await _staffService.updateStaffAsync(staff);
+            await _staffRepository.updateStaffAsync(staff);
         }
     }
 }

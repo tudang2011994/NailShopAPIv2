@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(MyAppDbContext))]
-    [Migration("20250113005310_InitialDatabase1")]
-    partial class InitialDatabase1
+    [Migration("20250130033047_AddPendingChanges")]
+    partial class AddPendingChanges
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,12 +32,15 @@ namespace Infrastructure.Migrations
                     b.Property<int>("ServiceId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("SpecialRequest")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("StaffId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
@@ -51,6 +54,35 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("Core.Entities.Coupon", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Coupons");
                 });
 
             modelBuilder.Entity("Core.Entities.JoinEntities.StaffService", b =>
@@ -68,6 +100,50 @@ namespace Infrastructure.Migrations
                     b.ToTable("StaffServices");
                 });
 
+            modelBuilder.Entity("Core.Entities.LoyaltyPoint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("LoyaltyPoints");
+                });
+
+            modelBuilder.Entity("Core.Entities.Reward", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RequiredPoints")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rewards");
+                });
+
             modelBuilder.Entity("Core.Entities.Service", b =>
                 {
                     b.Property<int>("Id")
@@ -77,8 +153,8 @@ namespace Infrastructure.Migrations
                     b.Property<float>("Amount")
                         .HasColumnType("REAL");
 
-                    b.Property<int>("Duration")
-                        .HasColumnType("INTEGER");
+                    b.Property<float>("Duration")
+                        .HasColumnType("REAL");
 
                     b.Property<bool>("IsValid")
                         .HasColumnType("INTEGER");
@@ -102,6 +178,10 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("WorkingDay")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("Staffs");
@@ -117,13 +197,23 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("LoyaltyPoints")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("isRegisterUser")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -157,6 +247,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Core.Entities.Coupon", b =>
+                {
+                    b.HasOne("Core.Entities.User", "User")
+                        .WithMany("Coupons")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Core.Entities.JoinEntities.StaffService", b =>
                 {
                     b.HasOne("Core.Entities.Service", "Service")
@@ -176,6 +277,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("Staff");
                 });
 
+            modelBuilder.Entity("Core.Entities.LoyaltyPoint", b =>
+                {
+                    b.HasOne("Core.Entities.User", "User")
+                        .WithMany("LoyaltyPointsTransactions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Core.Entities.Service", b =>
                 {
                     b.Navigation("Bookings");
@@ -193,6 +305,10 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Core.Entities.User", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Coupons");
+
+                    b.Navigation("LoyaltyPointsTransactions");
                 });
 #pragma warning restore 612, 618
         }
